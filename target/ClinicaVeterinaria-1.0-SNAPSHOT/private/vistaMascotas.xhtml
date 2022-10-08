@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>   
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">
+            <ui:define name="content">        
+                <div class="card">
+                    <h:form id="formulario">
+                        <p:growl id="message" showDetail="true"/> 
+                        <p:dataTable id="mascotas"
+                                        var="mascota" 
+                                        selectionMode="single"
+                                        widgetVar="tablaMascotas"
+                                        rowKey="#{mascota.idMascota}" 
+                                        selection="#{vistaMascotasController.pet}"
+                                        value="#{vistaMascotasController.listaMascotas}"
+                                        emptyMessage="No se han encontrado clientes con ese filtro"
+                                        filteredValue="#{vistaMascotasController.mascotasFiltradas}"
+                                        globalFilterFunction="#{vistaMascotasController.filtroGlobal}" 
+                                        allowUnsorting="true" sortMode="single" >                            
+
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('tablaMascotas').filter()" style="width:300px; margin-right: 20px"
+                                                 placeholder="Filtrar mascotas" />
+                                    <p:commandButton value="Añadir mascota" action="altaMascota" styleClass="ui-button-info"></p:commandButton>
+                                </div>
+                            </f:facet>
+                            
+                            <p:column headerText="Nombre" sortBy="#{mascota.nombre}">
+                                <h:outputText value="#{mascota.nombre}" />
+                            </p:column>
+                            
+                            <p:column headerText="Propietario" sortBy="#{mascota.propietario.apellidos}">
+                                <h:outputText value="#{mascota.propietario.nombre} #{mascota.propietario.apellidos}" />
+                            </p:column>
+
+                            <p:column headerText="Teléfono" sortBy="#{mascota.propietario.telefono}">
+                                <h:outputText value="#{mascota.propietario.telefono}" />
+                            </p:column> 
+
+                            <p:column headerText="Especie" sortBy="#{mascota.especie}">
+                                <h:outputText value="#{mascota.especie}" />
+                            </p:column> 
+
+                            <p:column headerText="Raza" sortBy="#{mascota.raza}">
+                                <h:outputText value="#{mascota.raza}" />
+                            </p:column> 
+
+                            <p:column headerText="Sexo" sortBy="#{mascota.sexo}">
+                                <h:outputText value="#{mascota.sexo}" />
+                            </p:column> 
+
+                            <p:column headerText="Fecha de nacimiento" sortBy="#{mascota.fechaNacimiento}">
+                                <h:outputText value="#{mascota.fechaNacimiento}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column> 
+                        </p:dataTable>
+                        
+                        <p:contextMenu for="mascotas">
+                            <p:menuitem value="Ver" update="detalleMascota" icon="pi pi-search"
+                                        oncomplete="PF('mascotaDialog').show()"/>
+                            <p:menuitem value="Editar" icon="pi pi-pencil"
+                                        action="editarMascota"/>
+                            <p:menuitem value="Eliminar" update="mascotas" icon="pi pi-times"
+                                        action="#{vistaMascotasController.eliminar()}">
+                                    <p:confirm header="Confirmación" message="¿Quieres eliminar esta mascota?" icon="pi pi-info-circle" />
+                            </p:menuitem>
+                        </p:contextMenu>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                            <p:commandButton value="Eliminar" type="button" styleClass="ui-confirmdialog-yes" />
+                        </p:confirmDialog>
+                        
+                        <p:dialog header="Ficha mascota" widgetVar="mascotaDialog" modal="true" showEffect="fade"
+                                    hideEffect="fade" resizable="false">                  
+                            <p:scrollPanel id="detalleMascota" mode="native" style="max-height: 700px">   
+                                
+                                <h:panelGrid id="gridDatosPersonales" columns="2" cellpadding="7">
+                                    <p:outputLabel value="Nombre" class="bold"/>
+                                    <p:outputLabel value="#{vistaMascotasController.pet.nombre}"/>
+
+                                    <p:outputLabel value="Especie" class="bold"/>
+                                    <p:outputLabel value="#{vistaMascotasController.pet.especie}"/>
+
+                                    <p:outputLabel value="Raza" class="bold"/>
+                                    <p:outputLabel value="#{vistaMascotasController.pet.raza}"/>
+
+                                    <p:outputLabel value="Sexo" class="bold"/>
+                                    <p:outputLabel value="#{vistaMascotasController.pet.sexo}"/>
+
+                                    <p:outputLabel value="Fecha de nacimiento" class="bold"/>   
+                                    <h:outputText value="#{vistaMascotasController.pet.fechaNacimiento}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" class="bold"/>
+                                    </h:outputText>
+
+                                    <p:outputLabel value="Nº Microchip" class="bold"/>
+                                    <p:outputLabel value="#{vistaMascotasController.pet.numeroChip}"/>
+
+                                    <p:outputLabel value="Peso" class="bold"/>
+                                    <p:outputLabel value="#{vistaMascotasController.pet.peso}"/>
+                                    
+                                    <p:outputLabel value="Comportamiento" class="bold"/>
+                                    <p:outputLabel value="#{vistaMascotasController.pet.comportamiento}"/>
+
+                                    <h:panelGrid id="gridAntecedentes" columns="1" cellpadding="7">
+                                        <p:outputLabel value="Antecedentes" class="bold"/>
+                                        <p:outputLabel value="#{vistaMascotasController.pet.comentarios}" escape="false"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                                
+                            </p:scrollPanel>
+                        </p:dialog>
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

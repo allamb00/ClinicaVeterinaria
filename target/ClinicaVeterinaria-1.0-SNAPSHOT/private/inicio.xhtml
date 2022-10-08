@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>
+
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">
+
+            <ui:define name="content">
+                <div class="card">
+                   <h:form>
+                       
+                       <p:growl id="messages" showDetail="true"/>
+
+                       <p:schedule id="schedule" value="#{inicioController.eventModel}" widgetVar="myschedule" aspectRatio="2.5" >
+                           <p:ajax event="dateSelect" listener="#{inicioController.onDateSelect}" update="eventDetails"
+                                   oncomplete="PF('eventDialog').show();"/>
+                           <p:ajax event="eventSelect" listener="#{inicioController.onEventSelect}" update="eventDetails"
+                                   oncomplete="PF('eventDialog').show();"/>
+                           <p:ajax event="eventMove" listener="#{inicioController.onEventMove}" update="messages"/>
+                           <p:ajax event="eventResize" listener="#{inicioController.onEventResize}" update="messages"/>
+                       </p:schedule>
+
+                       <p:dialog widgetVar="eventDialog" header="Detalles del evento" showEffect="fade" hideEffect="fade">
+                           <h:panelGrid id="eventDetails" columns="1" cellpadding="7">
+                               <p:inputText id="title" value="#{inicioController.event.title}" required="true" 
+                                            class="w100" placeholder="Añade un título"/>
+                               
+                               <p:inputTextarea id="description" value="#{inicioController.event.description}"
+                                                class="w100" rows="6" cols="33" placeholder="Descripción"/>
+
+                               <p:outputLabel for="from" value="Desde" styleClass="p-text-bold"/>
+                               <p:datePicker id="from" value="#{inicioController.event.startDate}" pattern="dd/MM/yyyy"
+                                             showTime="true" appendTo="@(body)" class="w100"/>
+
+                               <p:outputLabel for="to" value="Hasta" styleClass="p-text-bold"/>
+                               <p:datePicker id="to" value="#{inicioController.event.endDate}" pattern="dd/MM/yyyy"
+                                             showTime="true" appendTo="@(body)" class="w100"/>
+
+                               <p:selectBooleanCheckbox id="allDay" value="#{inicioController.event.allDay}" itemLabel="Todo el día"/>
+                           </h:panelGrid>
+
+                           <div class="p-d-flex p-jc-between p-mt-3">
+                                <h:panelGrid id="eventActions" columns="2" cellpadding="7" class="w100">
+                                    <p:commandButton type="reset" value="Reset" styleClass="p-text-bold ui-button-outlined"/>
+                                    <p:outputLabel/>
+                                    <p:commandButton id="removeButton" icon="pi pi-trash" action="#{inicioController.onEventDelete()}"
+                                           oncomplete="PF('myschedule').update();PF('eventDialog').hide();" styleClass="ui-button-danger">
+                                        <p:confirm header="Confirmación" message="¿Quieres eliminar este evento?" icon="pi pi-info-circle" />
+                                    </p:commandButton>
+                                    <p:commandButton id="addButton" value="Guardar" action="#{inicioController.addEvent}"
+                                                oncomplete="PF('myschedule').update();PF('eventDialog').hide();" style="float:right;"/>
+                                </h:panelGrid>
+                           </div>
+                       </p:dialog>
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                            <p:commandButton value="Eliminar" type="button" styleClass="ui-confirmdialog-yes ui-button-danger" />
+                        </p:confirmDialog>     
+                   </h:form>
+               </div>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

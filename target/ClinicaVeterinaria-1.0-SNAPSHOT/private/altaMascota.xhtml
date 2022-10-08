@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <body>
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">            
+            <ui:define name="content">
+                <h:form id="Formulario">
+                    <p:growl id="growl" showDetail="true" />
+                    <p:panelGrid id="gridVista" columns="1" layout="grid"
+                                styleClass="ui-panelgrid-blank ui-fluid"
+                                style="border:0px none; background-color:transparent;">
+                        <p:fieldset legend="Datos cliente" class="centered medium">
+                            <h:panelGrid id="gridDatosPropietario" columns="2" cellpadding="7">
+                                    <p:outputLabel value="Cliente" style="margin-right: 95px"/>                                
+                                    <p:selectOneMenu id="cliente" value="#{altaMascotaController.idCliente}" style="width: 200%"  filter="true" filterMatchMode="contains">
+                                        <p:ajax event="change" update="@this" process="@this"/>
+                                        <f:selectItems value="#{altaMascotaController.listaClientes}" var="cliente" 
+                                                       itemLabel="#{cliente.nombre} #{cliente.apellidos}" 
+                                                       itemValue="#{cliente.idCliente}"/>
+                                    </p:selectOneMenu>                      
+                            </h:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="Datos de la mascota" class="centered medium">
+                            <h:panelGrid id="gridDatosMascota" columns="2" cellpadding="7">
+                                <p:outputLabel value="Nombre"/>
+                                <p:inputText id="nombre" value="#{altaMascotaController.pet.nombre}" class="w100" required="true" converter="toUpperCaseConverter"/>
+
+                                <p:outputLabel value="Especie"/>
+                                <p:inputText id="especie" value="#{altaMascotaController.pet.especie}" class="w100" required="true" converter="toUpperCaseConverter"/>
+
+                                <p:outputLabel value="Raza"/>
+                                <p:inputText id="raza" value="#{altaMascotaController.pet.raza}" class="w100" required="true" converter="toUpperCaseConverter"/>
+
+                                <p:outputLabel value="Sexo"/>
+                                <p:selectBooleanButton id="sexo" onLabel="Macho" offLabel="Hembra" class="genderButton" value="#{altaMascotaController.esMacho}" style="background: #{altaMascotaController.esMacho ? '' : '#fbe'}">
+                                    <p:ajax event="change" update="@this" process="@this"/>
+                                </p:selectBooleanButton>
+
+                                <p:outputLabel value="Peso"/>
+                                <p:inputNumber id="peso" value="#{altaMascotaController.pet.peso}" class="w100" required="true" decimalPlaces="3" minValue="0" decimalSeparator="," symbol=" kg" symbolPosition="s" emptyValue="always"/>
+
+                                <p:outputLabel value="Fecha de nacimiento"/>   
+                                <p:datePicker id="fechaNacimiento" value="#{altaMascotaController.pet.fechaNacimiento}" class="w100" monthNavigator="true" yearNavigator="true" locale="es" showWeek="true"/>
+
+                                <p:outputLabel value="Nº Microchip"/>
+                                <p:inputText id="numeroChip" value="#{altaMascotaController.pet.numeroChip}" class="w100" required="true" validatorMessage="Nº de microchip incorrecto">
+                                    <f:validateRegex pattern="\d{10,15}"/>
+                                </p:inputText>
+                                
+                                <p:outputLabel value="Comportamiento"/>
+                                <p:inputTextarea id="comportamiento" value="#{altaMascotaController.pet.comportamiento}" class="w100" rows="6" cols="33"/>
+
+                                <p:outputLabel value="Antecedentes"/>
+                                <p:textEditor id="comentarios" value="#{altaMascotaController.pet.comentarios}"
+                                              height="300" placeholder="" secure="false" class="w100">
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+
+                            </h:panelGrid>
+                            <div align="center" class="mt">
+                                <p:commandButton value="Registrar mascota" action="#{altaMascotaController.insertarMascota()}" update="Formulario" class="register-button"/>
+                            </div>
+                        </p:fieldset>
+                    </p:panelGrid>
+                </h:form>
+            </ui:define>
+            
+        </ui:composition>
+    </body>
+</html>
+

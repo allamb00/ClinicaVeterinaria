@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>   
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">
+            <ui:define name="content">
+                <h:form id="Formulario">
+                    <!--<p:growl id="message" showDetail="true"/>-->                    
+                    
+                    <p:dataTable id="ingresosActivos"
+                                    var="caso" 
+                                    selectionMode="single"
+                                    widgetVar="tablaIngresosActivos"
+                                    rowKey="#{caso.idCaso}" 
+                                    selection="#{vistaHistorialController.caso}"
+                                    value="#{vistaIngresosController.listaCasosActivos}"
+                                    emptyMessage="No se han encontrado ingresos" >                           
+
+                        <f:facet name="header">
+                            <div class="p-d-flex p-jc-end">
+                                <h:outputText style="font-weight:bold" value="INGRESOS ACTIVOS"/>
+                            </div>
+                        </f:facet>
+                        <p:column style="width:2rem">
+                            <p:rowToggler/>
+                        </p:column>
+                        
+                        <p:column headerText="Caso clínico">
+                            <h:outputText value="#{caso.idCaso}"/>
+                        </p:column>
+                        
+                        <p:column headerText="Paciente">
+                            <h:outputText value="#{caso.mascota.nombre}"/>
+                        </p:column>
+                        
+                        <p:column headerText="Raza">
+                            <h:outputText value="#{caso.mascota.raza} (#{caso.mascota.especie})"/>
+                        </p:column>
+                        
+                        <p:column headerText="Fecha Ingreso">
+                            <h:outputText value="#{caso.ingreso.fechaIngreso}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        
+                        <p:rowExpansion>
+                            <p:dataTable id="tablaConstantesActivos" var="c" value="#{caso.ingreso.constantes}" 
+                                        style="border: 1px #ddd solid" editable="true">
+                                
+                                <p:ajax event="rowEdit" listener="#{vistaIngresosController.editar}"/>
+                                
+                                <f:facet name="header">
+                                    <div class="p-d-flex p-jc-end">
+                                        <p:commandButton value="Nueva medición" actionListener="#{vistaIngresosController.altaConstantes(caso)}" action="altaConstantes" styleClass="ui-button-info" style="margin-right: 20px"/>
+                                        <p:commandButton value="Dar el alta" styleClass="ui-button-warning"
+                                                         actionListener="#{vistaIngresosController.darElAlta(caso)}" update="Formulario">
+                                            <p:confirm header="Confirmación" message="¿Dar el alta al paciente?" icon="pi pi-info-circle" />
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                                                
+                                <p:column headerText="Frecuencia cardíaca" style="background-color: #{(c.freqCardiaca lt 120 || c.freqCardiaca gt 140) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.freqCardiaca} lpm" style="color: #{(c.freqCardiaca lt 120 || c.freqCardiaca gt 140) ? '#f00' : '' }" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputfreqCardiaca" value="#{c.freqCardiaca}" size="5" required="true"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Frecuencia respiratoria" style="background-color: #{(c.freqRespiratoria lt 25 || c.freqRespiratoria gt 35) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.freqRespiratoria} rpm" style="color: #{(c.freqRespiratoria lt 25 || c.freqRespiratoria gt 35) ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputfreqRespiratoria" value="#{c.freqRespiratoria}" size="5" required="true"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Pulso">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.pulso}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText id="inputpulso" value="#{c.pulso}" converter="toUpperCaseConverter"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Tiempo de relleno capilar" style="background-color: #{(c.tiempoRellenoCapilar lt 1 || c.tiempoRellenoCapilar gt 2) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.tiempoRellenoCapilar} s" style="color: #{(c.tiempoRellenoCapilar lt 1 || c.tiempoRellenoCapilar gt 2) ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputtiempoRellenoCapilar" value="#{c.tiempoRellenoCapilar}" size="5"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Mucosas">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.mucosas}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:selectOneMenu id="selectmucosas" value="#{c.mucosas}">
+                                                <f:selectItem itemLabel="ROSADAS Y HÚMEDAS" itemValue="ROSADAS Y HÚMEDAS"/>
+                                                <f:selectItem itemLabel="SECAS" itemValue="SECAS"/>
+                                                <f:selectItem itemLabel="PÁLIDAS" itemValue="PÁLIDAS"/>
+                                                <f:selectItem itemLabel="CIANÓTICAS" itemValue="CIANÓTICAS"/>
+                                                <f:selectItem itemLabel="ICTÉRICAS" itemValue="ICTÉRICAS"/>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Exploración de ganglios" style="background-color: #{(c.exploracionGanglios eq 'INFARTADOS') ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.exploracionGanglios}" style="color: #{(c.exploracionGanglios eq 'INFARTADOS') ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:selectOneMenu id="selectexploracionGanglios" value="#{c.exploracionGanglios}">
+                                                <f:selectItem itemLabel="CCN" itemValue="CCN"/>
+                                                <f:selectItem itemLabel="INFARTADOS" itemValue="INFARTADOS"/>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="T. recuperación pliegue cutáneo" style="background-color: #{(c.tRecPliegueCutaneo gt 5) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                    <h:outputText value="#{c.tRecPliegueCutaneo} s" style="color: #{(c.tRecPliegueCutaneo gt 5) ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputtRecPliegueCutaneo" value="#{c.tRecPliegueCutaneo}" size="5"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Hora de medición">
+                                    <h:outputText value="#{c.horaMedicion}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy - HH:mm"/>
+                                    </h:outputText>
+                                </p:column> 
+                                
+                                <p:column style="width:3rem">
+                                    <p:rowEditor editTitle="Editar" cancelTitle="Cancelar" saveTitle="Guardar"/>
+                                </p:column>
+                                <p:column style="width:3rem">
+                                    
+                                    <p:commandButton update="tablaConstantesActivos"
+                                                     icon="pi pi-trash" styleClass="ui-button-danger" title="Eliminar medición"
+                                                     actionListener="#{vistaIngresosController.eliminar(caso, c)}">
+                                        <p:confirm header="Confirmación" message="¿Quieres eliminar esta medición?" icon="pi pi-info-circle" />
+                                    </p:commandButton>
+                                </p:column>
+                                
+                            </p:dataTable> 
+                        </p:rowExpansion>
+                        
+                    </p:dataTable> 
+                    
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                        <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                        <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" />
+                    </p:confirmDialog>       
+                    
+                    <p:dataTable id="ingresosCerrados"
+                                    var="caso" 
+                                    selectionMode="single"
+                                    widgetVar="tablaIngresosCerrados"
+                                    rowKey="#{caso.idCaso}" 
+                                    selection="#{vistaHistorialController.caso}"
+                                    value="#{vistaIngresosController.listaCasosCerrados}"
+                                    emptyMessage="No se han encontrado ingresos"
+                                    filteredValue="#{vistaIngresosController.listaCasosFiltrados}"
+                                    globalFilterFunction="#{vistaIngresosController.filtroGlobal}" 
+                                    allowUnsorting="true" sortMode="single" >
+                        
+                        <f:facet name="header">
+                            <div class="p-d-flex p-jc-end">
+                                <h:outputText style="font-weight:bold" value="INGRESOS CERRADOS"/>
+                            </div>
+                            <div class="p-d-flex p-jc-end">
+                                <p:inputText id="globalFilter" onkeyup="PF('tablaIngresosCerrados').filter()" style="width:300px"
+                                             placeholder="Filtrar ingresos" />
+                            </div>
+                        </f:facet>
+                        
+                        <p:column style="width:2rem">
+                            <p:rowToggler/>
+                        </p:column>
+                        
+                        <p:column headerText="Caso clínico" sortBy="#{caso.idCaso}">
+                            <h:outputText value="#{caso.idCaso}"/>
+                        </p:column>
+                        
+                        <p:column headerText="Paciente" sortBy="#{caso.mascota.nombre}">
+                            <h:outputText value="#{caso.mascota.nombre}"/>
+                        </p:column>
+                        
+                        <p:column headerText="Raza" sortBy="#{caso.mascota.raza}">
+                            <h:outputText value="#{caso.mascota.raza} (#{caso.mascota.especie})"/>
+                        </p:column>
+                        
+                        <p:column headerText="Fecha Ingreso" sortBy="#{caso.ingreso.fechaIngreso}">
+                            <h:outputText value="#{caso.ingreso.fechaIngreso}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        
+                        <p:column headerText="Fecha Alta" sortBy="#{caso.ingreso.fechaAlta}" sortOrder="desc">
+                            <h:outputText value="#{caso.ingreso.fechaAlta}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+                        
+                        <p:rowExpansion>
+                            <p:dataTable id="tablaConstantesCerrados" var="c" value="#{caso.ingreso.constantes}" 
+                                        style="border: 1px #ddd solid">
+                                
+                                <p:ajax event="rowEdit" listener="#{vistaIngresosController.editar}"/>
+                                                                
+                                <p:column headerText="Frecuencia cardíaca" style="background-color: #{(c.freqCardiaca lt 120 || c.freqCardiaca gt 140) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.freqCardiaca} lpm" style="color: #{(c.freqCardiaca lt 120 || c.freqCardiaca gt 140) ? '#f00' : '' }" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputfreqCardiaca" value="#{c.freqCardiaca}" size="5"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Frecuencia respiratoria" style="background-color: #{(c.freqRespiratoria lt 25 || c.freqRespiratoria gt 35) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.freqRespiratoria} rpm" style="color: #{(c.freqRespiratoria lt 25 || c.freqRespiratoria gt 35) ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputfreqRespiratoria" value="#{c.freqRespiratoria}" size="5"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Pulso">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.pulso}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText id="inputpulso" value="#{c.pulso}" converter="toUpperCaseConverter"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Tiempo de relleno capilar" style="background-color: #{(c.tiempoRellenoCapilar lt 1 || c.tiempoRellenoCapilar gt 2) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.tiempoRellenoCapilar} s" style="color: #{(c.tiempoRellenoCapilar lt 1 || c.tiempoRellenoCapilar gt 2) ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputtiempoRellenoCapilar" value="#{c.tiempoRellenoCapilar}" size="5"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Mucosas">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.mucosas}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:selectOneMenu id="selectmucosas" value="#{c.mucosas}">
+                                                <f:selectItem itemLabel="ROSADAS Y HÚMEDAS" itemValue="ROSADAS Y HÚMEDAS"/>
+                                                <f:selectItem itemLabel="SECAS" itemValue="SECAS"/>
+                                                <f:selectItem itemLabel="PÁLIDAS" itemValue="PÁLIDAS"/>
+                                                <f:selectItem itemLabel="CIANÓTICAS" itemValue="CIANÓTICAS"/>
+                                                <f:selectItem itemLabel="ICTÉRICAS" itemValue="ICTÉRICAS"/>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Exploración de ganglios" style="background-color: #{(c.exploracionGanglios eq 'INFARTADOS') ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{c.exploracionGanglios}" style="color: #{(c.exploracionGanglios eq 'INFARTADOS') ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:selectOneMenu id="selectexploracionGanglios" value="#{c.exploracionGanglios}">
+                                                <f:selectItem itemLabel="CCN" itemValue="CCN"/>
+                                                <f:selectItem itemLabel="INFARTADOS" itemValue="INFARTADOS"/>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="T. recuperación pliegue cutáneo" style="background-color: #{(c.tRecPliegueCutaneo gt 5) ? '#fdd' : '' }">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                    <h:outputText value="#{c.tRecPliegueCutaneo} s" style="color: #{(c.tRecPliegueCutaneo gt 5) ? '#f00' : '' }"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber id="inputtRecPliegueCutaneo" value="#{c.tRecPliegueCutaneo}" size="5"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                
+                                <p:column headerText="Hora de medición">
+                                    <h:outputText value="#{c.horaMedicion}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy - HH:mm"/>
+                                    </h:outputText>
+                                </p:column> 
+                                
+                            </p:dataTable> 
+                        </p:rowExpansion>
+                        
+                    </p:dataTable>
+                    
+
+                </h:form>
+                <script> //Override del rowExpansion para que seleccione la fila
+                    PrimeFaces.widget.DataTable.prototype.toggleExpansion = (function() {
+                    var cached_function = PrimeFaces.widget.DataTable.prototype.toggleExpansion;
+                    return function() {
+                        var row = arguments[0].closest('tr');
+                        if(this.cfg.selectionMode === 'single') {
+                            this.unselectAllRows();
+                        }
+                        if(this.cfg.selectionMode){
+                            this.selectRow(row, false);
+                        }    
+                        var result = cached_function.apply(this, arguments);
+                        return result;
+                    };
+                   })();
+                </script>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

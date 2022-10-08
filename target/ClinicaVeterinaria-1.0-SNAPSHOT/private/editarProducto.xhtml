@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">            
+            <ui:define name="content">
+                <h:form id="Formulario">
+                    <p:growl id="growl" showDetail="true" />
+                    <p:fieldset legend="Datos del producto" class="centered small">
+                        <h:panelGrid id="gridDatosProducto" columns="2" cellpadding="7">
+                            <p:outputLabel value="Nombre"/>
+                            <p:inputText id="nombre" value="#{editarProductoController.pro.nombre}" class="w100" required="true" converter="toUpperCaseConverter"/>
+                            
+                            <p:outputLabel value="Fabricante"/>
+                            <p:inputText id="fabricante" value="#{editarProductoController.pro.fabricante}" class="w100" required="true" converter="toUpperCaseConverter"/>
+                            
+                            <p:outputLabel value="Cantidad"/>
+                            <p:inputNumber id="cantidad" value="#{editarProductoController.pro.cantidad}" class="w100" modifyValueOnWheel="true" required="true" minValue="1"/>
+                            
+                            <p:outputLabel value="Características"/>
+                            <p:inputText id="caracteristicas" value="#{editarProductoController.pro.caracteristicas}" class="w100" required="true" converter="toUpperCaseConverter"/>
+                            
+                            <p:outputLabel value="Nº Lote"/>
+                            <p:inputText id="numeroLote" value="#{editarProductoController.pro.numeroLote}" class="w100" required="true"  maxlength="10"/>
+                            
+                            <p:outputLabel value="Almacenamiento"/>
+                            <p:inputText id="almacenamiento" value="#{editarProductoController.pro.almacenamiento}" class="w100" required="true" converter="toUpperCaseConverter"/>
+                            
+                            <p:outputLabel value="Fecha de entrada"/>   
+                            <p:datePicker id="fechaEntrada" value="#{editarProductoController.pro.fechaEntrada}" class="w100" monthNavigator="true" yearNavigator="true" locale="es" showWeek="true"/>
+                        </h:panelGrid>
+                        <div align="center" class="mt">
+                            <p:commandButton value="Editar producto" action="#{editarProductoController.editarProducto()}" update="Formulario" class="register-button"/>
+                        </div>
+                    </p:fieldset>
+                </h:form>
+            </ui:define>
+            
+        </ui:composition>
+    </body>
+</html>
+

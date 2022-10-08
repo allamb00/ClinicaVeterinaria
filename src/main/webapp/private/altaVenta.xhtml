@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <body>
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">            
+            <ui:define name="content">
+                <h:form id="Formulario">
+                    <p:growl id="growl" showDetail="true" />
+                    <p:fieldset legend="Datos factura" class="centered small">
+                            
+                        <p:dataTable id="tablaDescuentoPago" var="avc" widgetVar="tablaIngresosActivos" value="#{vistaIngresosController}">
+                            
+                            <p:column headerText="Descuento">
+                                <h:outputText id="cDescuento" value="#{altaVentaController.caso.mascota.propietario.tieneDescuento}" converter="descuentoConverter"/>
+                            </p:column>   
+                            <p:column headerText="Tipo de pago">
+                                <p:selectOneMenu id="tipoPago" value="#{altaVentaController.ven.factura.tipoPago}">
+                                    <f:selectItem itemLabel="Tarjeta" itemValue="T"/>
+                                    <f:selectItem itemLabel="En efectivo" itemValue="E"/>
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <p:dataTable id="tablaDesglose" var="avc" widgetVar="tablaIngresosActivos" value="#{vistaIngresosController}">
+                            <p:column headerText="Desglose">
+                                <ui:repeat value="#{altaVentaController.caso.tratamientos}" var="t">
+                                    <h:panelGrid id="gridDatosTratamiento" columns="2" cellpadding="2">
+                                        <h:outputText value="#{t.tratamiento}:"/>
+                                        <h:outputText value="#{t.precio}€"/>
+                                    </h:panelGrid>
+                                </ui:repeat>
+                                
+                                <h:panelGrid id="gridCosteTratamientos" columns="2" cellpadding="2">
+                                    <p:outputLabel value="Coste tratamientos"/>
+                                    <h:outputText id="cTratamientos" value="#{altaVentaController.costeTratamientos()}€" converter="toUpperCaseConverter"/>
+                                </h:panelGrid>
+                                <h:panelGrid id="gridDesgloseTotal" columns="2" cellpadding="2">
+                                    <p:outputLabel value="Subtotal (SIN IVA)"/>
+                                    <h:outputText id="subtotal" value="#{altaVentaController.ven.factura.subtotal}€"/>
+                                    <p:outputLabel value="IVA del"/>
+                                    <h:outputText id="iva" value="#{altaVentaController.ven.factura.iva}%"/>
+                                    <p:outputLabel value="Descuento"/>
+                                    <h:outputText id="descuento" value="-#{altaVentaController.ven.factura.descuento}€"/>
+                                    <p:outputLabel value="Total (IVA incluido)"/>
+                                    <h:outputText id="total" value="#{altaVentaController.ven.factura.total}€"/>
+                                </h:panelGrid>
+                            </p:column>                            
+                            
+                        </p:dataTable>  
+                        <div align="center" class="mt">
+                            <p:commandButton value="Registrar venta" action="#{altaVentaController.insertarVenta()}" update="Formulario" class="register-button"/>
+                        </div>
+                    </p:fieldset>
+                </h:form>
+            </ui:define>
+            
+        </ui:composition>
+    </body>
+</html>
+

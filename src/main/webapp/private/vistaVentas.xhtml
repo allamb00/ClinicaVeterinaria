@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>   
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">
+            <ui:define name="content">        
+                <div class="card">
+                    <h:form id="formulario">
+                        <p:growl id="message" showDetail="true"/> 
+                        <p:dataTable id="ventas"
+                                        var="venta" 
+                                        selectionMode="single"
+                                        widgetVar="tablaVentas"
+                                        rowKey="#{venta.idVenta}" 
+                                        selection="#{vistaVentasController.ven}"
+                                        value="#{vistaVentasController.listaVentas}"
+                                        emptyMessage="No se han encontrado facturas con ese filtro"
+                                        filteredValue="#{vistaVentasController.ventasFiltradas}"
+                                        globalFilterFunction="#{vistaVentasController.filtroGlobal}" 
+                                        allowUnsorting="true" sortMode="single">                            
+
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('tablaVentas').filter()" style="width:300px; margin-right: 20px"
+                                                 placeholder="Filtrar facturas" />
+                                    <p:commandButton value="Añadir venta" styleClass="ui-button-info"
+                                                     onclick="PF('casoDialog').show()"/>
+                                </div>
+                            </f:facet>
+                            
+                            <p:column headerText="Caso" sortBy="#{venta.consulta.idCaso}">
+                                <h:outputText value="#{venta.consulta.idCaso}" />
+                            </p:column>
+                            
+                            <p:column headerText="Paciente" sortBy="#{venta.consulta.mascota.nombre}">
+                                <h:outputText value="#{venta.consulta.mascota.nombre}" />
+                            </p:column>
+                            
+                            <p:column headerText="Cliente" sortBy="#{venta.consulta.mascota.propietario.nombre}">
+                                <h:outputText value="#{venta.consulta.mascota.propietario.nombre} #{venta.consulta.mascota.propietario.apellidos}" />
+                            </p:column>                            
+
+                            <p:column headerText="Tratamientos">
+                                <ui:repeat value="#{venta.consulta.tratamientos}" var="t">
+                                    <h:outputText value="#{t.tratamiento}&lt;br/&gt;" escape="false"/>
+                                </ui:repeat>
+                            </p:column> 
+
+                            <p:column headerText="Total" sortBy="#{venta.factura.total}">
+                                <h:outputText value="#{venta.factura.total} €" />
+                            </p:column> 
+
+                            <p:column headerText="Fecha" sortBy="#{venta.factura.fechaCobro}" sortOrder="desc">
+                                <h:outputText value="#{venta.factura.fechaCobro}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:outputText>
+                            </p:column> 
+                        </p:dataTable>
+                        
+                        <p:contextMenu for="ventas" class="hola">
+                            <p:menuitem value="Ver factura" update="detalleVenta" icon="pi pi-search"
+                                        oncomplete="PF('ventaDialog').show()"/>
+                            <p:menuitem value="Eliminar" update="ventas" icon="pi pi-times"
+                                        action="#{vistaVentasController.eliminar()}">
+                                    <p:confirm header="Confirmación" message="¿Quieres eliminar esta venta?" icon="pi pi-info-circle" />
+                            </p:menuitem>
+                        </p:contextMenu>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                            <p:commandButton value="Eliminar" type="button" styleClass="ui-confirmdialog-yes" />
+                        </p:confirmDialog>
+                        
+                        
+                        <p:dialog id="casoDialog" widgetVar="casoDialog" modal="true" showEffect="fade"
+                            hideEffect="fade" resizable="false"> 
+                            <p:panel rendered="#{vistaVentasController.listaCasosPendientes.size() gt 0}">
+                                <h:panelGrid id="gridCasoDialog" columns="1" cellpadding="7" class="w100">
+                                    <p:selectOneMenu id="casoClinico" value="#{vistaVentasController.caso.idCaso}">
+                                        <p:ajax event="change" update="@this" process="@this"/>
+                                        <f:selectItems value="#{vistaVentasController.listaCasosPendientes}" var="caso" 
+                                                       itemLabel="#{caso.idCaso} - #{caso.mascota.propietario.nombre} #{caso.mascota.propietario.apellidos}" 
+                                                       itemValue="#{caso.idCaso}"/>
+                                    </p:selectOneMenu>
+                                        <p:commandButton value="Tramitar" styleClass="ui-button-info" 
+                                                     actionListener="#{vistaVentasController.establecerCaso(vistaVentasController.caso.idCaso)}" 
+                                                     action="altaVenta"/>
+                                </h:panelGrid>
+                            </p:panel>
+                            <h:outputLabel rendered="#{vistaVentasController.listaCasosPendientes.size() eq 0}" value="Crea un nuevo caso o actualiza la página"/>
+                            
+                            <f:facet name="header">
+                                <h:outputText id="dialogHeader" 
+                                              value="#{(vistaVentasController.listaCasosPendientes.size() eq 0) ? 'No hay casos pendientes de cobro' : 'Caso clínico a cobrar'}"/>
+                            </f:facet>
+                        </p:dialog>
+                        
+                        
+                        <p:dialog header="Datos Factura" widgetVar="ventaDialog" modal="true" showEffect="fade"
+                                    hideEffect="fade" resizable="false">                
+                            <p:scrollPanel id="detalleVenta" mode="native" style="max-height: 700px">     
+                                <p:commandButton value="Imprimir" type="button" icon="pi pi-print" styleClass="p-d-block p-shadow-2 p-mb-3" style="float:right;">
+                                    <p:printer target="gridDetalle"/>
+                                </p:commandButton> 
+                                <div id="imprimir">
+                                
+                                    <h:panelGrid id="gridDetalle" columns="1" cellpadding="7" class="w100">
+
+                                        <h:panelGrid id="gridDatosCliente" columns="2" cellpadding="7">                                    
+                                            <p:outputLabel value="Cliente" class="bold"/>
+                                            <p:outputLabel value="#{vistaVentasController.ven.consulta.mascota.propietario.nombre} #{vistaVentasController.ven.consulta.mascota.propietario.apellidos} "/>
+                                        </h:panelGrid>
+
+                                        <p:fieldset legend="#{vistaVentasController.ven.consulta.mascota.nombre}">
+                                            <h:panelGrid id="gridDatosMascota" columns="2" cellpadding="7">  
+                                                <p:outputLabel value="Raza:" class="bold"/>
+                                                <p:outputLabel value="#{vistaVentasController.ven.consulta.mascota.raza}"/>
+                                                <p:outputLabel value="Nº Microchip:" class="bold"/>
+                                                <p:outputLabel value="#{vistaVentasController.ven.consulta.mascota.numeroChip}"/>
+                                            </h:panelGrid>
+                                        </p:fieldset>
+
+                                        <p:fieldset legend="Datos factura">
+                                            <h:panelGrid id="gridDatosFactura" columns="2" cellpadding="7">  
+
+                                                <p:outputLabel value="Fecha:" class="bold"/>   
+                                                <h:outputText value="#{vistaVentasController.ven.factura.fechaCobro}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                                </h:outputText>
+
+                                                <p:outputLabel value="Caso clínico:" class="bold"/>
+                                                <p:outputLabel value="#{vistaVentasController.ven.consulta.idCaso}"/>
+
+                                                <p:outputLabel value="Tratamiento:" class="bold"/>
+                                                <p:outputLabel>
+                                                    <ui:repeat value="#{vistaVentasController.ven.consulta.tratamientos}" var="t">
+                                                        <h:outputText value="#{t.tratamiento}: #{t.precio} € #{(t.campo.nombre eq 'HOSPITALIZACIÓN') ? '('.concat(vistaVentasController.ven.consulta.ingreso.diasIngreso).concat(' días)'): ''}&lt;br/&gt; " escape="false"/>
+                                                    </ui:repeat>
+                                                </p:outputLabel>
+
+                                                <p:outputLabel value="Descuento:" class="bold"/>
+                                                <p:outputLabel value="#{vistaVentasController.ven.factura.descuento} €"/>
+
+                                                <p:outputLabel value="Subtotal:" class="bold"/>
+                                                <p:outputLabel value="#{vistaVentasController.ven.factura.subtotal} €"/>
+
+                                                <p:outputLabel value="IVA:" class="bold"/>
+                                                <p:outputLabel value="#{vistaVentasController.ven.factura.iva}"/>
+
+                                                <p:outputLabel value="Total:" class="bold"/>
+                                                <p:outputLabel value="#{vistaVentasController.ven.factura.total} €"/>
+
+                                                <p:outputLabel value="Tipo de pago:" class="bold"/>
+                                                <p:outputLabel value="#{(vistaVentasController.ven.factura.tipoPago eq 'E') ? 'EFECTIVO' : 'TARJETA'} "/>
+
+                                                <p:outputLabel value="Cobrado por:" class="bold"/>   
+                                                <p:outputLabel value="#{vistaVentasController.ven.factura.porUsuario.nombre}" />
+                                            </h:panelGrid>
+                                        </p:fieldset>
+                                    </h:panelGrid>
+                                </div>
+                            </p:scrollPanel>
+                        </p:dialog>
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

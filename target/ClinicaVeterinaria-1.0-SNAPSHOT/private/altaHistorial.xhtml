@@ -1,0 +1,307 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <body>
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">            
+            <ui:define name="content">
+                <h:form id="Formulario" style="background-color: white">
+                    <p:growl id="growl" showDetail="true" />
+                    <p:panelGrid id="gridDatosPersonales" columns="3" layout="grid"
+                                styleClass="ui-panelgrid-blank ui-fluid"
+                                style="border:0px none; background-color:transparent;">
+                        
+                        <p:fieldset legend="Datos Paciente">
+                            <h:panelGrid id="gridDatosPaciente" columns="2" cellpadding="7">
+                                    <p:outputLabel value="Paciente"/>                                
+                                    <p:selectOneMenu id="paciente" value="#{altaHistorialController.idMascota}" style="width: 300px"  filter="true" filterMatchMode="contains">
+                                        <p:ajax event="change" update="@this" process="@this"/>
+                                        <f:selectItems value="#{altaHistorialController.listaMascotas}" var="mascota" 
+                                                       itemLabel="#{mascota.nombre} - #{mascota.raza} (#{mascota.propietario.nombre} #{mascota.propietario.apellidos})" 
+                                                       itemValue="#{mascota.idMascota}"/>
+                                    </p:selectOneMenu>                         
+                            </h:panelGrid>
+                        </p:fieldset>
+
+                        <p:fieldset legend="Datos Veterinario">
+                            <h:panelGrid id="gridDatosVeterinario" columns="2" cellpadding="7">
+                                    <p:outputLabel value="Veterinario"/>                                
+                                    <p:selectOneMenu id="veterinario" value="#{altaHistorialController.idVeterinario}" style="width: 300px"  filter="true" filterMatchMode="contains">
+                                        <p:ajax event="change" update="@this" process="@this"/>
+                                        <f:selectItems value="#{altaHistorialController.listaVeterinarios}" var="veterinario" 
+                                                       itemLabel="#{veterinario.nombre} #{veterinario.apellidos}" 
+                                                       itemValue="#{veterinario.idUsuario}"/>
+                                    </p:selectOneMenu>                          
+                            </h:panelGrid>
+                        </p:fieldset>  
+                        
+                            <p:selectBooleanButton onLabel="Hospitalización" offLabel="No hospitalización"
+                                                   onIcon="pi pi-check" offIcon="pi pi-times" 
+                                                   style="width:15rem; margin: 3rem 0 0 25%; background: #{altaHistorialController.esNecesarioIngreso ? '' : '#f9cc00'}" 
+                                                   value="#{altaHistorialController.esNecesarioIngreso}">
+                                <p:ajax event="change" update="@this" process="@this"/>
+                            </p:selectBooleanButton>
+                    
+                    </p:panelGrid>                    
+                            
+                    
+                    <p:fieldset legend="Datos Caso clínico">
+                        <p:panelGrid id="gridDatosCaso" columns="2" layout="grid"
+                                styleClass="ui-panelgrid-blank ui-fluid"
+                                style="border:0px none; background-color:transparent;">
+                            
+                            <p:panel header="Antecedentes">
+                                <p:textEditor id="antecedentes" value="#{altaHistorialController.caso.antecedentes}"
+                                              height="100" placeholder="" secure="false" >
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+                            </p:panel>
+                            
+                            <p:panel header="Cuadro clínico">
+                                <p:textEditor id="cuadroClinico" value="#{altaHistorialController.caso.cuadroClinico}"
+                                              height="100" placeholder="" secure="false">
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+                            </p:panel>
+                            
+                            <p:panel header="Anamnesis">
+                                <p:textEditor id="anamnesis" value="#{altaHistorialController.caso.anamnesis}"
+                                              height="100" placeholder="" secure="false">
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+                            </p:panel>
+                            
+                            <p:panel header="Exploración">
+                                <p:textEditor id="exploracion" value="#{altaHistorialController.caso.exploracion}"
+                                              height="100" placeholder="" secure="false">
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+                            </p:panel>
+                            
+                            <p:panel header="Pruebas">
+                                <p:textEditor id="pruebas" value="#{altaHistorialController.caso.pruebas}"
+                                              height="100" placeholder="" secure="false">
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+                            </p:panel>
+                            
+                            <p:panel header="Diagnóstico">
+                                <p:textEditor id="diagnostico" value="#{altaHistorialController.caso.diagnostico}"
+                                              height="100" placeholder="" secure="false">
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+                            </p:panel>  
+                            
+                            <p:panel header="Tratamiento">  
+                                <p:selectManyMenu id="selectTratamientos" value="#{altaHistorialController.tratamientosSeleccionados}"
+                                                    var="t" filter="true" filterMatchMode="contains" showCheckbox="true" styleClass="manymenu-advanced" >
+                                    <f:selectItems value="#{altaHistorialController.listaTratamientos}" var="tratamiento" itemLabel="#{tratamiento.tratamiento}"
+                                                    itemValue="#{tratamiento}" />
+
+                                    <p:column>
+                                        <h:outputText value="#{t.campo.nombre}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.tratamiento}"/>
+                                    </p:column>
+                                </p:selectManyMenu>                              
+                            </p:panel>    
+                            
+                            <p:panel header="Material">  
+                                
+                                    <p:textEditor id="material" value="#{altaHistorialController.caso.material}"
+                                              height="215" placeholder="" secure="false">
+                                    <f:facet name="toolbar">
+                                        <span class="ql-formats">
+                                            <button class="ql-header" value="1"></button>
+                                            <button class="ql-header" value="2"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                            <select class="ql-background"></select>
+                                        </span>     
+                                        <span class="ql-formats">
+                                            <button class="ql-bold"></button>
+                                            <button class="ql-italic"></button>
+                                            <button class="ql-underline"></button>
+                                            <button class="ql-strike"></button>
+                                        </span>                                       
+                                        <span class="ql-formats">
+                                            <button class="ql-script" value="sub"></button>
+                                            <button class="ql-script" value="super"></button>
+                                        </span>                                            
+                                        <span class="ql-formats">
+                                            <button class="ql-list" value="ordered"></button>
+                                            <button class="ql-list" value="bullet"></button>
+                                        </span> 
+                                        <span class="ql-formats">
+                                            <select class="ql-align"></select>
+                                        </span>                         
+                                    </f:facet>
+                                </p:textEditor>
+                                
+                            </p:panel>
+                        </p:panelGrid>
+                        <div align="center" class="mt">
+                            <p:commandButton value="Registrar caso clínico" action="#{altaHistorialController.insertarCaso()}" update="Formulario" class="register-button"/>
+                        </div>
+                    </p:fieldset>
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>
+

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>   
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">
+            <ui:define name="content">
+                <div class="card">
+                    <h:form id="formulario">
+                        <p:growl id="message" showDetail="true"/> 
+                        <p:dataTable id="usuarios"
+                                        var="usuario" 
+                                        selectionMode="single"
+                                        widgetVar="tablaUsuarios"
+                                        rowKey="#{usuario.idUsuario}" 
+                                        selection="#{vistaUsuariosController.usu}"
+                                        value="#{vistaUsuariosController.listaUsuarios}"
+                                        emptyMessage="No se han encontrado usuarios con ese filtro"
+                                        filteredValue="#{vistaUsuariosController.usuariosFiltrados}"
+                                        globalFilterFunction="#{vistaUsuariosController.filtroGlobal}" 
+                                        allowUnsorting="true" sortMode="single" >                            
+
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('tablaUsuarios').filter()" style="width:300px; margin-right: 20px"
+                                                 placeholder="Filtrar usuarios" />
+                                    <p:commandButton value="Añadir usuario" action="altaUsuario" styleClass="ui-button-info"></p:commandButton>
+                                </div>
+                            </f:facet>                            
+
+                            <p:column headerText="" style="width: 2rem">
+                                <div style ="background-color: ##{usuario.color}" class="userColor"></div>
+                            </p:column>                        
+
+                            <p:column headerText="Usuario" sortBy="#{usuario.userName}">
+                                <h:outputText value="#{usuario.userName}" />
+                            </p:column>
+                            
+                            <p:column headerText="Nombre" sortBy="#{usuario.nombre}">
+                                <h:outputText value="#{usuario.nombre}" />
+                            </p:column>
+                            
+                            <p:column headerText="Apellidos" sortBy="#{usuario.apellidos}">
+                                <h:outputText value="#{usuario.apellidos}" />
+                            </p:column>
+                            
+                            <p:column headerText="DNI" sortBy="#{usuario.dni}">
+                                <h:outputText value="#{usuario.dni}" />
+                            </p:column>
+
+                            <p:column headerText="Teléfono" sortBy="#{usuario.telefono}">
+                                <h:outputText value="#{usuario.telefono}" />
+                            </p:column>
+
+                            <p:column headerText="Rol" sortBy="#{usuario.rol.rol}">
+                                <h:outputText value="#{usuario.rol.rol}" />
+                            </p:column>
+                            
+                            <p:column headerText="Fecha registro" sortBy="#{usuario.fechaRegistro}">
+                                <h:outputText value="#{usuario.fechaRegistro}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column> 
+                            
+                            <p:column headerText="Última sesión" sortBy="#{usuario.ultimaSesion}">
+                                <h:outputText value="#{usuario.ultimaSesion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:outputText>
+                            </p:column> 
+                            
+                        </p:dataTable>
+                        
+                        <p:contextMenu for="usuarios">
+                            <p:menuitem value="Editar" icon="pi pi-pencil"
+                                        action="editarUsuario"/>
+                            <p:menuitem value="Eliminar" update="usuarios" icon="pi pi-times"
+                                        action="#{vistaUsuariosController.eliminar()}">
+                                    <p:confirm header="Confirmación" message="¿Quieres eliminar este usuario?" icon="pi pi-info-circle" />
+                            </p:menuitem>
+                        </p:contextMenu>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                            <p:commandButton value="Eliminar" type="button" styleClass="ui-confirmdialog-yes" />
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

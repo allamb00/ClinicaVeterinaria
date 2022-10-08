@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>   
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">
+            <ui:define name="content">        
+                <div class="card">
+                    <h:form id="formulario">
+                        <p:growl id="message" showDetail="true"/> 
+                        <p:dataTable id="historial"
+                                        var="caso" 
+                                        selectionMode="single"
+                                        widgetVar="tablaHistorial"
+                                        rowKey="#{caso.idCaso}" 
+                                        selection="#{vistaHistorialController.caso}"
+                                        value="#{vistaHistorialController.listaHistorial}"
+                                        emptyMessage="No se han encontrado casos con ese filtro"
+                                        filteredValue="#{vistaHistorialController.historialFiltrado}"
+                                        globalFilterFunction="#{vistaHistorialController.filtroGlobal}" 
+                                        allowUnsorting="true" sortMode="single" tableStyle="width:auto">                            
+
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('tablaHistorial').filter()" style="width:300px; margin-right: 20px"
+                                                 placeholder="Filtrar casos" />
+                                    <p:commandButton value="Nuevo caso" action="altaHistorial" styleClass="ui-button-info" rendered="#{menuController.usu.rol.idRol lt 3}"></p:commandButton>
+                                </div>
+                            </f:facet>
+                            <p:column headerText="ID" sortBy="#{caso.idCaso}">
+                                <h:outputText value="#{caso.idCaso}" />
+                            </p:column>
+                            
+                            <p:column headerText="Nombre" sortBy="#{caso.mascota.nombre}">
+                                <h:outputText value="#{caso.mascota.nombre}" />
+                            </p:column>
+                            
+                            <p:column headerText="Veterinario" sortBy="#{caso.veterinario.apellidos}">
+                                <h:outputText value="#{caso.veterinario.nombre} #{caso.veterinario.apellidos}" />
+                            </p:column>
+                            
+                            <p:column headerText="Propietario" sortBy="#{caso.mascota.propietario.apellidos}">
+                                <h:outputText value="#{caso.mascota.propietario.nombre} #{caso.mascota.propietario.apellidos}" />
+                            </p:column>
+
+                            <p:column headerText="Diagnóstico">
+                                <h:outputText value="#{caso.diagnostico}" escape="false"/>
+                            </p:column> 
+                            
+                            <p:column headerText="Fecha" sortBy="#{caso.fechaCaso}" sortOrder="desc">
+                                <h:outputText value="#{caso.fechaCaso}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:outputText>
+                            </p:column> 
+                        </p:dataTable>
+                        
+                        <p:contextMenu for="historial">
+                            <p:menuitem value="Ver" icon="pi pi-search"
+                                        oncomplete="PF('casoDialog').show()" update="casoDialog">
+                            </p:menuitem>
+                            <p:menuitem value="Editar" icon="pi pi-pencil"
+                                        action="editarHistorial" rendered="#{menuController.usu.rol.idRol lt 3}"/>
+                            <p:menuitem value="Eliminar" update="historial" icon="pi pi-times"
+                                        action="#{vistaHistorialController.eliminar()}" rendered="#{menuController.usu.rol.idRol lt 3}">
+                                    <p:confirm header="Confirmación" message="¿Quieres eliminar este caso?" icon="pi pi-info-circle" />
+                            </p:menuitem>
+                        </p:contextMenu>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                            <p:commandButton value="Eliminar" type="button" styleClass="ui-confirmdialog-yes" />
+                        </p:confirmDialog>
+                        
+                        <p:dialog id="casoDialog" header="Ficha clínica" widgetVar="casoDialog" modal="true" showEffect="fade"
+                                  hideEffect="fade" resizable="false" blockScroll="vertical">                            
+                            <p:scrollPanel id="detalleCaso" mode="native" style="max-height: 700px">  
+
+                                <p:commandButton value="Imprimir" type="button" icon="pi pi-print" styleClass="p-d-block p-shadow-2 p-mb-3" style="float:right;">
+                                    <p:printer target="gridDetalle"/>
+                                </p:commandButton> 
+                                <h:panelGrid id="gridDetalle" columns="1" cellpadding="7">   
+                                    <div id="imprimirTarg">
+                                        <h:panelGrid id="gridDatosPersonales" columns="2" cellpadding="7">                             
+                                            <p:fieldset legend="Datos Paciente">
+                                                <h:panelGrid id="gridDatosPaciente" columns="4" cellpadding="7">
+
+                                                    <p:outputLabel value="Raza" class="bold"/>
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.mascota.raza} (#{vistaHistorialController.caso.mascota.especie})"/>
+
+                                                    <p:outputLabel value="Nombre paciente" class="bold"/>
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.mascota.nombre}"/>
+
+                                                    <p:outputLabel value="Sexo" class="bold"/>
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.mascota.sexo}"/>
+
+                                                    <p:outputLabel value="Comportamiento" class="bold"/>
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.mascota.comportamiento}"/>
+                                                </h:panelGrid>
+                                                <h:panelGrid id="gridDatosAntecedentes" columns="1" cellpadding="7" style="max-width: 500px">
+                                                    <p:outputLabel value="Antecedentes" class="bold"/>
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.mascota.comentarios}" escape="false"/>
+                                                </h:panelGrid>
+                                            </p:fieldset>
+
+                                            <p:fieldset legend="Datos Cliente">
+                                                <h:panelGrid id="gridDatosCliente" columns="2" cellpadding="7">
+                                                    <p:outputLabel value="Cliente" class="bold"/>
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.mascota.propietario.nombre} #{vistaHistorialController.caso.mascota.propietario.apellidos}"/>
+
+                                                    <p:outputLabel value="Teléfono de contacto" class="bold"/>
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.mascota.propietario.telefono}"/>
+                                                </h:panelGrid>
+                                            </p:fieldset>
+                                        </h:panelGrid>
+                                        <p:fieldset legend="Caso clínico" class="w100" >
+                                            <h:panelGrid id="gridDatosCaso" columns="1" cellpadding="7" class="w100">
+                                                <p:outputLabel value="Fecha caso clínico" class="bold"/>
+                                                <h:outputText value="#{vistaHistorialController.caso.fechaCaso}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                                </h:outputText>
+
+                                                <h:panelGrid id="gridAnamnesis" columns="1" cellpadding="7" class="w100" >    
+                                                    <p:outputLabel value="Anamnesis" class="bold"/>  
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.anamnesis}" escape="false" />
+                                                </h:panelGrid>
+
+                                                <h:panelGrid id="gridCuadro" columns="1" cellpadding="7" class="w100">         
+                                                    <p:outputLabel value="Cuadro clínico" class="bold"/> 
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.cuadroClinico}" escape="false"/>
+                                                </h:panelGrid>
+
+                                                <h:panelGrid id="gridExploración" columns="1" cellpadding="7" class="w100">         
+                                                    <p:outputLabel value="Exploración" class="bold"/>      
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.exploracion}" escape="false"/>
+                                                </h:panelGrid>
+                                                
+                                                <h:panelGrid id="gridPruebas" columns="1" cellpadding="7" class="w100">         
+                                                    <p:outputLabel value="Pruebas" class="bold"/>    
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.pruebas}" escape="false"/>
+                                                </h:panelGrid>
+
+                                                <h:panelGrid id="gridDiagnóstico" columns="1" cellpadding="7" class="w100">         
+                                                    <p:outputLabel value="Diagnóstico" class="bold"/>   
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.diagnostico}" escape="false"/>
+                                                </h:panelGrid>
+
+                                                <h:panelGrid id="gridMaterial" columns="1" cellpadding="7" class="w100">         
+                                                    <p:outputLabel value="Material usado" class="bold"/>   
+                                                    <p:outputLabel value="#{vistaHistorialController.caso.material}" escape="false"/>
+                                                </h:panelGrid>
+
+                                                <h:panelGrid id="gridTratamiento" columns="1" cellpadding="7" class="w100">         
+                                                    <p:outputLabel value="Tratamiento" class="bold"/>  
+                                                    <ui:repeat value="#{vistaHistorialController.caso.tratamientos}" var="t">
+                                                        <h:outputText value="#{t.tratamiento}"/><br/>
+                                                    </ui:repeat>
+                                                </h:panelGrid>
+                                            </h:panelGrid>
+                                        </p:fieldset>
+                                    </div>
+                                </h:panelGrid>
+                            </p:scrollPanel>
+                        </p:dialog>
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

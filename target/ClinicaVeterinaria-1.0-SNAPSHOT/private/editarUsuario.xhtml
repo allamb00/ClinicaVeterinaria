@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">            
+            <ui:define name="content">
+                <h:form id="Formulario">
+                    <p:growl id="growl" showDetail="true" />
+                        <h:panelGrid id="aux" columns="1" cellpadding="7" class=" centered">
+                        <p:fieldset legend="Datos personales" class="centered verysmall">
+                            <h:panelGrid id="gridDatosPersonales" columns="2" cellpadding="7">
+                                
+                                <p:outputLabel value="Nombre"/>
+                                <p:inputText id="nombre" value="#{editarUsuarioController.usu.nombre}" required="true" converter="toUpperCaseConverter" validatorMessage="El nombre contiene caracteres no permitidos">
+                                    <f:validateRegex pattern="[A-ú]+(\s?[A-ú])*"/>
+                                </p:inputText>
+                                
+                                <p:outputLabel value="Apellidos"/>
+                                <p:inputText id="apellidos" value="#{editarUsuarioController.usu.apellidos}" required="true" converter="toUpperCaseConverter" validatorMessage="Los apellidos contienen caracteres no permitidos">
+                                    <f:validateRegex pattern="[A-ú]+(\s?[A-ú])*"/>
+                                </p:inputText>
+                                
+                                <p:outputLabel value="DNI"/>
+                                <p:inputText id="dni" value="#{editarUsuarioController.usu.dni}" class="w100" required="true" converter="toUpperCaseConverter" validatorMessage="DNI incorrecto">
+                                    <f:validateRegex pattern="\d{8}[A-z]"/>
+                                </p:inputText>
+
+                                <p:outputLabel value="Teléfono"/>
+                                <p:inputText id="telefono" value="#{editarUsuarioController.usu.telefono}" class="w100" required="true" validatorMessage="Nº de teléfono incorrecto">
+                                    <f:validateRegex pattern="\d{9}"/>
+                                </p:inputText>
+                                
+                            </h:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="Datos de empleado" class="centered verysmall">
+                            <h:panelGrid id="gridDatosAcceso" columns="2" cellpadding="7">
+
+                                <p:outputLabel value="Usuario"/>
+                                <p:outputLabel value="#{editarUsuarioController.usu.userName}"/>                                
+                                
+                                <p:outputLabel value="Rol"/>
+                                <p:selectOneMenu id="rol" value="#{editarUsuarioController.nRol}" class="w100">
+                                    <p:ajax event="change" update="@this" process="@this"/>
+                                    <f:selectItems value="#{editarUsuarioController.listaRoles}" var="rol" 
+                                                   itemLabel="#{rol.rol}" 
+                                                   itemValue="#{rol.idRol}" />
+                                </p:selectOneMenu>
+                            
+                                <p:outputLabel value="Color"/>
+                                <p:colorPicker value="#{editarUsuarioController.usu.color}" />                                    
+                                
+                                <p:outputLabel value=""/>
+                                <p:selectBooleanCheckbox value="#{editarUsuarioController.resetPass}" itemLabel="Resetear contraseña"/>
+                    
+                            </h:panelGrid>
+                        </p:fieldset>
+                    </h:panelGrid>
+                    <div align="center" class="mt">
+                        <p:commandButton value="Editar usuario" action="#{editarUsuarioController.editarUsuario()}" update="Formulario" class="register-button"/>
+                    </div>
+                </h:form>
+            </ui:define>
+            
+        </ui:composition>
+    </body>
+</html>
+

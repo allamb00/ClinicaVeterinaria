@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <body>   
+        <ui:composition template="./../WEB-INF/template/plantillaClinicaVeterinaria.xhtml">
+            <ui:define name="content">
+                <div class="card">
+                    <h:form id="formulario">
+                        <p:growl id="message" showDetail="true"/> 
+                        <p:dataTable id="tarifas"
+                                        var="tarifa" 
+                                        selectionMode="single"
+                                        widgetVar="tablaTarifas"
+                                        rowKey="#{tarifa.idTarifa}" 
+                                        selection="#{vistaTarifasController.tar}"
+                                        value="#{vistaTarifasController.listaTarifas}"
+                                        emptyMessage="No se han encontrado tarifas con ese filtro"
+                                        filteredValue="#{vistaTarifasController.tarifasFiltradas}"
+                                        globalFilterFunction="#{vistaTarifasController.filtroGlobal}" 
+                                        allowUnsorting="true" sortMode="single" >                            
+
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('tablaTarifas').filter()" style="width:300px; margin-right: 20px"
+                                                 placeholder="Filtrar tratamiento" />
+                                    <p:commandButton value="Añadir tarifa" action="altaTarifa" styleClass="ui-button-info" rendered="#{menuController.usu.rol.idRol eq 1}"></p:commandButton>
+                                </div>
+                            </f:facet>
+                            
+                            <p:headerRow field="campo.idCampo"
+                                         expandable="true"
+                                         expanded="true" sortFunction="">
+
+                                <p:column colspan="4">
+                                        <h:outputText styleClass="p-ml-2" value="#{tarifa.campo.nombre}"/>
+                                </p:column>
+                            </p:headerRow>
+                            
+                            <p:column headerText="Tratamiento" sortBy="#{tarifa.tratamiento}">
+                                <h:outputText value="#{tarifa.tratamiento}" />
+                            </p:column>
+                            
+                            <p:column headerText="Precio" sortBy="#{tarifa.precio}">
+                                <h:outputText value="#{tarifa.precio} €" />
+                            </p:column>
+                            
+                            <p:column headerText="Desc. Alumnos" sortBy="#{tarifa.descAlumnos}">
+                                <h:outputText value="#{tarifa.descAlumnos} €" />
+                            </p:column>
+
+                            <p:column headerText="Desc. Protectora" sortBy="#{tarifa.descProtectora}">
+                                <h:outputText value="#{tarifa.descProtectora} €" />
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <p:contextMenu for="tarifas" rendered="#{menuController.usu.rol.idRol eq 1}">
+                            <p:menuitem value="Editar" icon="pi pi-pencil"
+                                        action="editarTarifa"/>
+                            <p:menuitem value="Eliminar" update="tarifas" icon="pi pi-times"
+                                        action="#{vistaTarifasController.eliminar()}">
+                                    <p:confirm header="Confirmación" message="¿Quieres eliminar esta tarifa?" icon="pi pi-info-circle" />
+                            </p:menuitem>
+                        </p:contextMenu>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                            <p:commandButton value="Eliminar" type="button" styleClass="ui-confirmdialog-yes" />
+                        </p:confirmDialog>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </h:form>
+                </div>
+                <script> //Override del rowExpansion para que seleccione la fila
+                    PrimeFaces.widget.DataTable.prototype.toggleExpansion = (function() {
+                    var cached_function = PrimeFaces.widget.DataTable.prototype.toggleExpansion;
+                    return function() {
+                        var row = arguments[0].closest('tr');
+                        if(this.cfg.selectionMode === 'single') {
+                            this.unselectAllRows();
+                        }
+                        if(this.cfg.selectionMode){
+                            this.selectRow(row, false);
+                        }    
+                        var result = cached_function.apply(this, arguments);
+                        return result;
+                    };
+                   })();
+                </script>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>
